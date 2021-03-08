@@ -1,2 +1,2 @@
 # Alzheimer detection using CNN
-Data Science Thesis
+Data Science Thesis by Fernando Herrán Albelda
