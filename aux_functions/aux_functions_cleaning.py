@@ -4,6 +4,7 @@ import shutil
 import matplotlib.pyplot as plt
 import nibabel as nib
 import numpy as np
+from deepbrain import Extractor
 
 
 def extract_images(root, new_root):
@@ -117,9 +118,124 @@ def load_images(folder):
         
         # Print counter status
         if(count_images % 20 == 0):
-            print(f"{count_images} images loaded")
+            print(f"        {count_images} images loaded")
     
     return images, titles, shapes
+
+
+def extract_slice(image, title = "None"):
+    """
+    Function to plot a collection of slices from the 3 points of views: axial, coronal and sagittal.
+    Inputs: 
+        - image = image to plot
+        - num_slices = number of slices for each plane
+    """
+    
+    ############################
+    ### INITIAL CALCULATIONS ###
+    ############################
+    
+    # Figure parameters (rows and columns)
+    num_rows = 2
+    num_columns = 3
+    num_slices = num_rows * num_columns
+    cut_value_slice = 0.4 # 30% of the axis shape
+    
+    # Get image data
+    data = image.get_fdata()
+    rotated = False
+    
+    if data.shape[0] == data.shape[1]:
+        
+        # Retrieve shape of the image shape
+        shape = data.shape 
+    
+    elif data.shape[1] == data.shape[2]:
+        
+        # Exchange axis 0 and 2
+        data = np.swapaxes(data, 0, 2) 
+        
+        # Retrieve shape of the image shape
+        shape = data.shape 
+        
+        rotated = True
+    
+    # Set cuts for each axis of the slice
+    cut_value_ver = [ int(shape[0] * 0.06), int(shape[0] * (1 - 0.3)) ]
+    cut_value_horiz = [ int(shape[2] * 0.1), int(shape[2] * (1 - 0.1)) ]
+
+    # Get random slices of coronal plane
+    x_1, x_2  = int(shape[1] * cut_value_slice), int(shape[1] * (1 - cut_value_slice))
+    step_ = int((x_2 - x_1) / 7)
+    slices_ = list(range(x_1, x_2, step_))[1:]
+
+    ######################
+    ### GET BRAIN MASS ###
+    ######################
+    
+    # Initialize brain tissue extractor
+    ext = Extractor()
+    
+    # Calculate probability of being brain tissue
+    prob = ext.run(data) 
+
+    # Extract mask with probaility higher than 0.5
+    mask = prob > 0.5
+    
+    ##############
+    ### FIGURE ###
+    ##############
+    
+    # Get heights and widths
+    heights = [i * (cut_value_ver[1] - cut_value_ver[0]) for i in [1] * num_rows]
+    widths = num_columns * [cut_value_horiz[1] - cut_value_horiz[0]]
+
+    # Set-up figure width and height
+    fig_width = 7.0
+    fig_height = fig_width * sum(heights) / sum(widths)
+
+    # Set figure
+    fig, axes = plt.subplots(num_rows, num_columns, 
+                            figsize = (fig_width, fig_height),
+                            gridspec_kw = {"height_ratios": heights})
+    
+    # Add 2D slices of coronal plane to each figure subplot
+    count_slice = 0
+    
+    for i in range(num_rows):
+        for j in range(num_columns):
+            
+            slice_index = slices_[count_slice]
+            
+            # Get 2D slice
+            slice_original = np.array(data[:, slice_index, :])
+
+            # Extract slice after skull-stripping 
+            slice_cleaned = return_clean_slice(slice_original, slice_index, mask, 2)
+
+            # Cut margins slice
+            
+            if rotated == True:
+                slice_plot = ndimage.rotate(slice_cleaned.T, 90)  ##### AQUIIIIIIIII
+                slice_plot = slice_plot[cut_value_ver[0]:cut_value_ver[1], cut_value_horiz[0]:cut_value_horiz[1]]
+                
+            else:
+                slice_plot = slice_cleaned[cut_value_ver[0]:cut_value_ver[1], cut_value_horiz[0]:cut_value_horiz[1]]
+                
+            # Add slice to figure
+            axes[i,j].imshow(slice_plot, cmap="gray")
+            axes[i,j].axis("off")
+            
+            count_slice += 1
+    
+    # Adjust space between figure subplots
+    plt.subplots_adjust(wspace=0, hspace=0, left=0, right=1, bottom=0, top=1);
+    
+    # Save figure
+    plt.savefig(title)
+    
+    # Close figure
+    plt.close(fig)
 
 
 def return_clean_slice(slice_original, slice_index, mask, border_voxels = 3):
