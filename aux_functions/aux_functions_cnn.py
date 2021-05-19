@@ -11,6 +11,7 @@ from keras import backend as K
 
 # Metrics packages
 from sklearn.metrics import roc_curve, roc_auc_score
+from sklearn.metrics import confusion_matrix, f1_score, recall_score, precision_score
 
 
 def f1(y_true, y_pred):
@@ -44,97 +45,72 @@ def f1(y_true, y_pred):
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
 
+def get_predictions(X, model):
+    
+    # Get predictions
+    fn_sensitive = 0.5  # False negative sensitive variable
+    y_predict = []
+
+    for sample in model.predict(X):
+        if sample < fn_sensitive:
+            y_predict.append(0)
+        else:
+            y_predict.append(1)
+    
+    return y_predict
+
+
+def get_evaluation(y, y_predict):
+    
+    # Evaluation
+    print("[+] Recall: "+"{:.2f}".format(recall_score(y, y_predict)))
+    print("[+] Precision: "+"{:.2f}".format(precision_score(y, y_predict)))
+    print("[+] F1 score: "+"{:.2f}".format(f1_score(y, y_predict)))
+
+    # Calculate confusion matrix
+    cm = confusion_matrix(y, y_predict)
+
+    # Plot confusion matrix
+    plt.figure(figsize=(8,5))
+    sns.heatmap(cm, annot=True, fmt="", cmap="Blues", cbar=False)
+    plt.xlabel('Predicted label', fontsize= 14, fontweight='bold')
+    plt.ylabel('True label', fontsize= 14, fontweight='bold') 
+    plt.tight_layout()
+    plt.show()
+
+
 def plot_history(history):
     '''
     Function to plot the accuracy & lost history of the traing and validation data.
     Inputs: history
     '''
-    
-    acc = history.history['binary_accuracy']
-    val_acc = history.history['val_binary_accuracy']
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-    
-    x = range(1, len(acc) + 1)
-
-    # Plot history curves
-    figure, axes = plt.subplots(1,2,figsize = (12,6))
-    
-    axes[0].plot(x, acc, 'b', label='Training acc')
-    axes[0].plot(x, val_acc, 'r', label='Validation acc')
-    axes[0].set_title('Training and validation accuracy', fontsize=18, fontweight="bold")
-    axes[0].set_xlabel("Epoch", fontsize=14)
-    axes[0].set_ylabel("Accuracy", fontsize=14)
-    axes[0].legend(fontsize=12, loc="best")
-    axes[0].grid(linestyle='-', linewidth=1, alpha = 0.5)
-    axes[0].set_ylim(bottom=0)
-    
-    axes[1].plot(x, loss, 'b', label='Training loss')
-    axes[1].plot(x, val_loss, 'r', label='Validation loss')
-    axes[1].set_title('Training and validation loss', fontsize=18, fontweight="bold")
-    axes[1].set_xlabel("Epoch",fontsize=14)
-    axes[1].set_ylabel("Loss", fontsize=14)
-    axes[1].legend(fontsize=12, loc="best")
-    axes[1].grid(linestyle='-', linewidth=1, alpha = 0.5)
-    axes[1].set_ylim(bottom=0)
-
-
-def plot_history_2(history):
-    '''
-    Function to plot the accuracy & lost history of the traing and validation data.
-    Inputs: history
-    '''
-    
-    acc = history.history['f1']
-    val_acc = history.history['val_f1']
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-    
-    x = range(1, len(acc) + 1)
-
-    # Plot history curves
-    figure, axes = plt.subplots(1, 2, figsize = (12,6))
-    
-    axes[0].plot(x, acc, 'b', label='Training')
-    axes[0].plot(x, val_acc, 'r', label='Validation')
-    axes[0].set_title('Training and validation F1 score', fontsize=18, fontweight="bold")
-    axes[0].set_xlabel("Epoch", fontsize=14)
-    axes[0].set_ylabel("Accuracy", fontsize=14)
-    axes[0].legend(fontsize=12, loc="best")
-    axes[0].grid(linestyle='-', linewidth=1, alpha = 0.5)
-    axes[0].set_ylim(bottom=0)
-    
-    axes[1].plot(x, loss, 'b', label='Training')
-    axes[1].plot(x, val_loss, 'r', label='Validation')
-    axes[1].set_title('Training and validation loss', fontsize=18, fontweight="bold")
-    axes[1].set_xlabel("Epoch",fontsize=14)
-    axes[1].set_ylabel("Loss", fontsize=14)
-    axes[1].legend(fontsize=12, loc="best")
-    axes[1].grid(linestyle='-', linewidth=1, alpha = 0.5)
-    axes[1].set_ylim(bottom=0)
-    
-
-def plot_metric(history, metric):
-    history_dict = history.history
-    values = history_dict[metric]
-    if 'val_' + metric in history_dict.keys():  
-        val_values = history_dict['val_' + metric]
-
-    epochs = range(1, len(values) + 1)
-
-    if 'val_' + metric in history_dict.keys():  
-        plt.plot(epochs, val_values, label='Validation')
-    plt.semilogy(epochs, values, label='Training')
-
-    if 'val_' + metric in history_dict.keys():  
-        plt.title('Training and validation %s' % metric)
+    if type(history) is dict:
+        pass
     else:
-        plt.title('Training %s' % metric)
-    plt.xlabel('Epochs')
-    plt.ylabel(metric.capitalize())
-    plt.legend()
-    plt.grid()
+        history = history.history
+    
+    limit_ = int(len(list(history.keys()))/2)
+    keys_ = list(history.keys())[:limit_]
 
+    # Plot history curves
+    figure, axes = plt.subplots(1, len(keys_), figsize = (12,6))
+
+    for index_, key_ in enumerate(keys_):
+
+        train_plot = history[key_]
+        val_plot = history["val_" + key_]
+
+        x = range(1, len(train_plot) + 1)
+
+        axes[index_].plot(x, train_plot, 'b', label='Training')
+        axes[index_].plot(x, val_plot, 'r', label='Validation')
+        axes[index_].set_xlabel("Epoch", fontsize=14)
+        axes[index_].set_ylabel(key_.capitalize(), fontsize=14)
+        axes[index_].set_title("Training and validation " + key_, fontsize=18, fontweight="bold")
+        axes[index_].legend(fontsize=12, loc="best")
+        axes[index_].grid(linestyle='-', linewidth=1, alpha = 0.5)
+        axes[index_].set_ylim(bottom=0)
+    
 
 def plot_roc_curve(model, X_train, X_test, y_train, y_test, save_fig = False):
     '''
@@ -180,6 +156,9 @@ def plot_roc_curve(model, X_train, X_test, y_train, y_test, save_fig = False):
         
         plt.savefig(root_results + '/roc_curve.png', dpi = 500, transparent = False)
 
+########################################################################
+############################## DEPRECATED ##############################
+########################################################################
 
 def build_model_OLD(input_shape):
     '''
@@ -220,3 +199,60 @@ def build_model_OLD(input_shape):
                   metrics = ['binary_accuracy']) 
     
     return model
+
+
+def plot_metric_OLD(history, metric):
+    history_dict = history.history
+    values = history_dict[metric]
+    if 'val_' + metric in history_dict.keys():  
+        val_values = history_dict['val_' + metric]
+
+    epochs = range(1, len(values) + 1)
+
+    if 'val_' + metric in history_dict.keys():  
+        plt.plot(epochs, val_values, label='Validation')
+    plt.semilogy(epochs, values, label='Training')
+
+    if 'val_' + metric in history_dict.keys():  
+        plt.title('Training and validation %s' % metric)
+    else:
+        plt.title('Training %s' % metric)
+    plt.xlabel('Epochs')
+    plt.ylabel(metric.capitalize())
+    plt.legend()
+    plt.grid()
+
+
+def plot_history_OLD(history):
+    '''
+    Function to plot the accuracy & lost history of the traing and validation data.
+    Inputs: history
+    '''
+    
+    acc = history.history['f1']
+    val_acc = history.history['val_f1']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    
+    x = range(1, len(acc) + 1)
+
+    # Plot history curves
+    figure, axes = plt.subplots(1, 2, figsize = (12,6))
+    
+    axes[0].plot(x, acc, 'b', label='Training')
+    axes[0].plot(x, val_acc, 'r', label='Validation')
+    axes[0].set_title('Training and validation F1 score', fontsize=18, fontweight="bold")
+    axes[0].set_xlabel("Epoch", fontsize=14)
+    axes[0].set_ylabel("Accuracy", fontsize=14)
+    axes[0].legend(fontsize=12, loc="best")
+    axes[0].grid(linestyle='-', linewidth=1, alpha = 0.5)
+    axes[0].set_ylim(bottom=0)
+    
+    axes[1].plot(x, loss, 'b', label='Training')
+    axes[1].plot(x, val_loss, 'r', label='Validation')
+    axes[1].set_title('Training and validation loss', fontsize=18, fontweight="bold")
+    axes[1].set_xlabel("Epoch",fontsize=14)
+    axes[1].set_ylabel("Loss", fontsize=14)
+    axes[1].legend(fontsize=12, loc="best")
+    axes[1].grid(linestyle='-', linewidth=1, alpha = 0.5)
+    axes[1].set_ylim(bottom=0)
