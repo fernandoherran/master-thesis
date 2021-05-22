@@ -11,7 +11,9 @@ from keras import backend as K
 
 # Metrics packages
 from sklearn.metrics import roc_curve, roc_auc_score
-from sklearn.metrics import confusion_matrix, f1_score, recall_score, precision_score
+from sklearn.metrics import confusion_matrix, f1_score, recall_score, precision_score, accuracy_score
+
+import pandas as pd
 
 
 def f1(y_true, y_pred):
@@ -62,20 +64,32 @@ def get_predictions(X, model):
 
 def get_evaluation(y, y_predict):
     
-    # Evaluation
-    print("[+] Recall: "+"{:.2f}".format(recall_score(y, y_predict)))
-    print("[+] Precision: "+"{:.2f}".format(precision_score(y, y_predict)))
-    print("[+] F1 score: "+"{:.2f}".format(f1_score(y, y_predict)))
+    # Get Metrics
+    accuracy = accuracy_score(y, y_predict)
+    precision = precision_score(y, y_predict)
+    recall = recall_score(y, y_predict)
+    f1 = f1_score(y, y_predict)
+    stats_text = "[+] Accuracy = {:0.2f}\n[+] Precision = {:0.2f}\n[+] Recall = {:0.2f}\n[+] F1 Score = {:0.2f}".format(
+                accuracy,precision,recall,f1)
 
     # Calculate confusion matrix
+    cm_labels = ["Healty", "Alzheimer"]
     cm = confusion_matrix(y, y_predict)
-
+    cm = pd.DataFrame(cm, index = cm_labels, columns = cm_labels)
+    
     # Plot confusion matrix
     plt.figure(figsize=(8,5))
-    sns.heatmap(cm, annot=True, fmt="", cmap="Blues", cbar=False)
-    plt.xlabel('Predicted label', fontsize= 14, fontweight='bold')
-    plt.ylabel('True label', fontsize= 14, fontweight='bold') 
+    ax = sns.heatmap(cm, annot = True, fmt = "", cmap = "Blues", cbar = False)    
+    plt.xlabel('Predicted label', fontsize = 14, fontweight = 'bold')
+    plt.ylabel('True label', fontsize = 14, fontweight = 'bold') 
     plt.tight_layout()
+    
+    plt.text(0.8, 1.15,
+             stats_text, 
+             style = 'normal', 
+             fontsize = 13, 
+             bbox = {'facecolor': 'ghostwhite', 'alpha':1 , 'pad': 8})
+        
     plt.show()
 
 
