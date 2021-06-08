@@ -1,3 +1,5 @@
+import pandas as pd
+
 # Visualization packages
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -5,46 +7,54 @@ sns.set_theme(context='notebook')
 sns.set_style("ticks")
 
 # Tensorflow packages
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import InputLayer, Conv2D, MaxPool2D, BatchNormalization, Flatten, Dense, Dropout
-from keras import backend as K
+import tensorflow as tf
+#from tensorflow.keras.models import Sequential
+#from tensorflow.keras.layers import InputLayer, Conv2D, MaxPool2D, BatchNormalization, Flatten, Dense, Dropout
+from tensorflow.keras import backend as K
 
 # Metrics packages
 from sklearn.metrics import roc_curve, roc_auc_score
 from sklearn.metrics import confusion_matrix, f1_score, recall_score, precision_score, accuracy_score
 
-import pandas as pd
+
+def parse_tfr_element(element):
+    
+    # Define TFRecord dictionary
+    data = {'height': tf.io.FixedLenFeature([], tf.int64),
+            'width':tf.io.FixedLenFeature([], tf.int64),
+            'depth':tf.io.FixedLenFeature([], tf.int64),
+            'raw_image' : tf.io.FixedLenFeature([], tf.string),
+            'label':tf.io.FixedLenFeature([], tf.int64)}
+    
+    # Read TFRecord content
+    content = tf.io.parse_single_example(element, data)
+  
+    raw_image = content['raw_image']
+    label = content['label']
+  
+    feature = tf.io.parse_tensor(raw_image, out_type = tf.float32)
+    
+    # Reshape feature and label 
+    feature = tf.reshape(feature, shape = [110, 130, 80])
+    label = tf.reshape(label, shape = [1])
+    
+    return (feature, label)
 
 
-def f1(y_true, y_pred):
-    def recall(y_true, y_pred):
-        """Recall metric.
+def load_tfr_dataset(tfr_dir = "../Datasets/TFRecords/", pattern ="*_volumes.tfrecords"):
+    
+    # Get files matching the pattern
+    files = tf.io.gfile.glob(tfr_dir+pattern)
+    
+    AUTO = tf.data.AUTOTUNE
 
-        Only computes a batch-wise average of recall.
+    # Create the dataset
+    dataset = tf.data.TFRecordDataset(files, num_parallel_reads = AUTO)
 
-        Computes the recall, a metric for multi-label classification of
-        how many relevant items are selected.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-        recall = true_positives / (possible_positives + K.epsilon())
-        return recall
-
-    def precision(y_true, y_pred):
-        """Precision metric.
-
-        Only computes a batch-wise average of precision.
-
-        Computes the precision, a metric for multi-label classification of
-        how many selected items are relevant.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-        precision = true_positives / (predicted_positives + K.epsilon())
-        return precision
-    precision = precision(y_true, y_pred)
-    recall = recall(y_true, y_pred)
-    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+    # Map function
+    dataset = dataset.map(parse_tfr_element, num_parallel_calls = AUTO)
+    
+    return dataset
 
 
 def get_predictions(X, model):
@@ -170,49 +180,40 @@ def plot_roc_curve(model, X_train, X_test, y_train, y_test, save_fig = False):
         
         plt.savefig(root_results + '/roc_curve.png', dpi = 500, transparent = False)
 
+
+def f1(y_true, y_pred):
+    def recall(y_true, y_pred):
+        """Recall metric.
+
+        Only computes a batch-wise average of recall.
+
+        Computes the recall, a metric for multi-label classification of
+        how many relevant items are selected.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        """Precision metric.
+
+        Only computes a batch-wise average of precision.
+
+        Computes the precision, a metric for multi-label classification of
+        how many selected items are relevant.
+        """
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
 ########################################################################
 ############################## DEPRECATED ##############################
 ########################################################################
-
-def build_model_OLD(input_shape):
-    '''
-    Function to build a convolutional neural network.
-    Inputs: input shape
-    '''
-
-    # Fix random seed for reproducibility
-    np.random.seed(123)
-    tf.random.set_seed(123) 
-
-    # Start model
-    model = Models.Sequential()
-    
-    # Input layer
-    model.add(Layers.Conv2D(50, kernel_size=(3,3),activation='relu',input_shape = input_shape))
-    
-    # Hidden layers 
-    model.add(Layers.Conv2D(18,kernel_size=(3,3),activation='relu'))
-    model.add(Layers.MaxPool2D(5,5))
-    model.add(Layers.Conv2D(18,kernel_size=(3,3),activation='relu'))
-    model.add(Layers.Conv2D(14,kernel_size=(3,3),activation='relu'))
-    model.add(Layers.Conv2D(10,kernel_size=(3,3),activation='relu'))
-    model.add(Layers.Conv2D(5,kernel_size=(3,3),activation='relu'))
-    model.add(Layers.MaxPool2D(5,5))
-    model.add(Layers.Flatten())
-    model.add(Layers.Dense(18,activation='relu'))
-    model.add(Layers.Dense(10,activation='relu'))
-    model.add(Layers.Dense(5,activation='relu'))
-    model.add(Layers.Dropout(rate=0.5))
-    
-    # Output layer
-    model.add(Layers.Dense(1, activation = 'sigmoid'))
-        
-    # Compile model
-    model.compile(loss = 'binary_crossentropy', 
-                  optimizer = 'adam', 
-                  metrics = ['binary_accuracy']) 
-    
-    return model
 
 
 def plot_metric_OLD(history, metric):
