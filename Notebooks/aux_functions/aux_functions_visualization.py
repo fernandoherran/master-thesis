@@ -1,9 +1,14 @@
+# Import libraries
+########################
 import os
 import gzip
 import shutil
 import matplotlib.pyplot as plt
 import nibabel as nib
 
+
+# Define functions 
+########################
 
 def axial_plot(nii_img, length = 180):
     """ 
@@ -25,29 +30,29 @@ def neuro_plot(nii_img, view_ = "axial", slice_ = 180):
     
     if view_ == "sagittal":
         fig, axes = plt.subplots(figsize=(10,8))
-        axes.imshow(nii_img.get_fdata()[slice_, :, :], cmap="gray", origin="lower")
+        axes.imshow(nii_img[slice_, :, :], cmap="gray", origin="lower")
         axes.set_title("Sagittal view", fontsize = 14)
     
     if view_ == "axial":   
         fig, axes = plt.subplots(figsize=(10,8))
-        axes.imshow(nii_img.get_fdata()[:, slice_, :].T, cmap="gray", origin="lower")
+        axes.imshow(nii_img[:, slice_, :].T, cmap="gray", origin="lower")
         axes.set_title("Axial view", fontsize = 14)
     
     if view_ == "coronal":
         fig, axes = plt.subplots(figsize=(10,8))
-        axes.imshow(nii_img.get_fdata()[:, :, slice_].T, cmap="gray", origin="lower")
+        axes.imshow(nii_img[:, :, slice_].T, cmap="gray", origin="lower")
         axes.set_title("Coronal view", fontsize = 14)
         
     
     if view_ == "all":
         fig, axes = plt.subplots(1, 3, figsize=(25,8))
         
-        axes[0].imshow(nii_img.get_fdata()[slice_[0], :, :], cmap="gray", origin="lower")
+        axes[0].imshow(nii_img[slice_[0], :, :], cmap="gray", origin="lower")
         axes[0].set_title("Sagittal view", fontsize = 14)
         
-        axes[1].imshow(nii_img.get_fdata()[:, slice_[1], :].T, cmap="gray", origin="lower")
+        axes[1].imshow(nii_img[:, slice_[1], :].T, cmap="gray", origin="lower")
         axes[1].set_title("Axial view", fontsize = 14)
         
-        axes[2].imshow(nii_img.get_fdata()[:, :, slice_[2]].T, cmap="gray", origin="lower")
+        axes[2].imshow(nii_img[:, :, slice_[2]].T, cmap="gray", origin="lower")
         axes[2].set_title("Coronal view", fontsize = 14)
 

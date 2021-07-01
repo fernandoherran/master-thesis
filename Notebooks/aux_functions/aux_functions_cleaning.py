@@ -1,3 +1,5 @@
+# Import libraries
+########################
 import os
 import gzip
 import shutil
@@ -6,76 +8,12 @@ import nibabel as nib
 import numpy as np
 from deepbrain import Extractor
 
+# Define functions 
+########################
 
-def extract_images(root, new_root):
-    '''
-    Function to extract nifti images from a folder (root), zip them and save them in new fodler (new_root)
-    ''' 
-    
-    # Create new directory to move files in case it doesn´t exist
-    if not os.path.exists(new_root):
-        os.makedirs(new_root)
-
-    # Get directions of the file and move them to new folder
-    for folder in sorted(os.listdir(root)):
-
-        # Avoid trigerring .DS_Store
-        if folder.startswith('.'):
-            continue
-
-        directions = []
-        directions.append(os.path.join(root,folder))
-        all_files = False
-
-        while all_files == False:
-            for index, path in enumerate(directions):
-
-                if (os.path.isfile(path)) == False:
-
-                    for subfolder in sorted(os.listdir(path)):
-
-                        if subfolder.startswith('.'):
-                            continue
-
-                        directions.append(os.path.join(path,subfolder))
-
-                    directions.remove(path)
-
-                if index == (len(directions) -1):
-                    is_not_file = False
-
-                    for item in directions:
-                        if (os.path.isfile(item)) == True:
-                            continue
-                        else:
-                            is_not_file = True
-
-                    if is_not_file == False:
-                        all_files = True
-                    else:
-                        break
-    
-        # Copy files, compress them and move them to new folder
-        for direction in directions:
-            new_direction = os.path.join(new_root,direction.split("/")[-1]) + ".gz"
-
-            # Check if file already exist in the new folder
-            if os.path.exists(new_direction) == False:
-                
-                # Copy image file to new folder
-                with open(direction, 'rb') as f_in:
-                    with gzip.open(new_direction, 'wb') as f_out:
-                        shutil.copyfileobj(f_in, f_out)
-            else:
-                print(f"File already exists in the new folder: {new_direction}")
-              
-        print(folder)
-        print("*" * 30)
-    
-    
 def load_images(folder):
     """ 
-    Function to load Nifti files from a folder.
+    Function used to load Nifti files from a folder.
     Input: folder path
     Output: list with images, list with titles, list with images shapes
     """
@@ -267,10 +205,6 @@ def return_clean_slice(slice_original, slice_index, mask, border_voxels = 3):
         
     return slice_cleaned
 
-
-##################################################
-################## DEPRECATED ####################
-##################################################
 
 def multiple_slices_OLD(image, title):
     """

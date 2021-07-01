@@ -1,0 +1,22 @@
+# Jupyter notebooks
+jupyter
+
+# Visualization
+matplotlib
+plotly
+nbformat
+opencv-python
+scikit-image
+
+# Data handling
+scipy
+pandas
+numpy
+
+# Preprocessing
+nibabel
+
+# Deep learning
+sklearn
+tensorflow
+optuna
