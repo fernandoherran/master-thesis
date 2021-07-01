@@ -18,7 +18,7 @@ Next libraries are used in the code:
 - Others: os, sys, time, numpy, pandas, random, scipy, shutil, sklearn,tqdm, functools, skimage, gzip
 
 ### Set-up virtual environment
-In order to run the code without having dependencies problems, user can create a virtual conda environment with all needed packages. To do that, please follow process below: 
+In order to run the code without having dependencies problems, user can create a virtual environment with all needed packages. To do that, please follow process below: 
 - Download `requirements.txt` file found in this master branch.
 - Open terminal, and run below command (tt will create a virtual environment in your computer):
 
