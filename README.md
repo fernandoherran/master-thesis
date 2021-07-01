@@ -1,5 +1,9 @@
-# Alzheimer detection using a Convolutional Neural Network
-Data Science Thesis done by Fernando Herrán Albelda
+# Alzheimer’s disease detection using Convolutional Neural Networks
+Project done by Fernando Herrán Albelda (Master in Data Science for KSchool). 
+
+An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been build for this thesis and can be used by the user to predict if a patient has signs of alzheimer uploading a MRI of his brain. Github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
+
+## Introduction
 
 ### Objective
 The goal of this thesis is to build a Convolutional Neural Network to classify patients with Alzheimer's disease (AD) or cognitively normal (CN) using their magnetic resonance images (MRI).
@@ -13,17 +17,32 @@ Next libraries are used in the code:
 - Visualization: matplotlib, seaborn
 - Others: os, sys, time, numpy, pandas, random, scipy, shutil, sklearn,tqdm, functools, skimage, gzip
 
-### Set-up environment
+### Set-up virtual environment
 In order to run the code without having dependencies problems, user can create a virtual conda environment with all needed packages. To do that, please follow process below: 
-- Download `tfm_env.yml` file found in this master branch.
-- Open terminal, and run below command. It will create an environment in your computer.
+- Download `requirements.txt` file found in this master branch.
+- Open terminal, and run below command (tt will create a virtual environment in your computer):
 
 ```
-conda env create -f tfm_env.yml
+python -m venv virtual_env
 ```
+- Once created, user can activate the virtual environment running the following command:
+```
+ source virtual_env/bin/activate
+```
+
+- Finally, user can install all needed dependencies in the virtual environment running the following command:
+```
+pip install -r requirements.txt
+```
+
+## Repository
+
+This repository has 3 main folders (Dataset, Notebooks and Results), together with the requirement.txt file and the README.md .
 
 ### Dataset
 
 ### Notebooks
+
+## Results & Conclusions
 
 ![alt text](https://github.com/fernandoherran/master-thesis/blob/89ef925d6e779f7a7894781591c73cab8cfb228a/Results/figures/test.png)
