@@ -25,3 +25,5 @@ conda env create -f tfm_env.yml
 ### Dataset
 
 ### Notebooks
+
+![alt text](https://github.com/fernandoherran/master-thesis/blob/89ef925d6e779f7a7894781591c73cab8cfb228a/Results/figures/test.png)
