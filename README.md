@@ -80,7 +80,7 @@ This project contains 5 main jupyter Notebooks, which are used to carry out all 
 
 - 1_Capture_data
 - 2_MRI_preprocessing
-- 3_TFR_preprocessing
+- 3_TFR_creation
 - 4_CNN_creation
 - 5_Alzheimer_prediction
 
@@ -91,7 +91,7 @@ TFM
 └── Notebooks
     ├── 1_Capture_data.ipynb
     ├── 2_MRI_preprocessing.ipynb
-    ├── 3_TFR_preprocessing.ipynb
+    ├── 3_TFR_creation.ipynb
     ├── 4_CNN_creation.ipynb
     ├── 5_Alzheimer_prediction.ipynb
     ├── aux_functions
