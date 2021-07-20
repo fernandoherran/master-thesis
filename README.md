@@ -18,10 +18,13 @@ Next libraries are used in the code:
 - Others: os, sys, time, numpy, pandas, random, scipy, shutil, sklearn,tqdm, functools, skimage, gzip
 
 ### Set-up virtual environment
-In order to run the code without having dependencies problems, user can create a virtual environment with all needed packages. To do that, please follow process below: 
-- Download `requirements.txt` file found in this master branch.
-- Open terminal, and run below command (it will create a virtual environment in your computer):
+In order to run the code without having dependencies problems, user can create a virtual environment with all needed packages. This virtual environment has a total size of 1.31 GB. To create the virtual environment, please follow process below: 
 
+- Clone github repository in your computer. Open terminal, and run comand below:
+```
+git clone https://github.com/fernandoherran/master-thesis.git
+```
+- Once cloaned, run below command to create a virtual environment in your computer:
 ```
 python -m venv virtual_env
 ```
@@ -29,8 +32,7 @@ python -m venv virtual_env
 ```
  source virtual_env/bin/activate
 ```
-
-- Finally, user can install all needed dependencies in the virtual environment running the following command:
+- Finally, user can install all needed dependencies in the virtual environment running the following command (file requirements.txt has been downloaded when cloning the repository:
 ```
 pip install -r requirements.txt
 ```
