@@ -52,7 +52,7 @@ TFM
 
 ### Dataset
 
-All data needed to carry out this project has been obtained from the [Alzheimer’s Disease Neuroimaging Initiative (ADNI)](http://adni.loni.usc.edu/about/) organization. This organization unites researchers which objective is to study and define the progression of Alzheimer’s disease (AD). ADNI organization collects different type data, including MRI and PET images, genetics, cognitive tests, blood biomarkers, etc. The access to this data is not opened to the public in general, and an application must be sent in order to get access to the data (here).
+All data needed to carry out this project has been obtained from the [Alzheimer’s Disease Neuroimaging Initiative (ADNI)](http://adni.loni.usc.edu/about/) organization. This organization unites researchers which objective is to study and define the progression of Alzheimer’s disease (AD). ADNI organization collects different type data, including MRI and PET images, genetics, cognitive tests, blood biomarkers, etc. The access to this data is not opened to the public in general, and an application must be sent in order to get access to the data (more information [here](https://ida.loni.usc.edu/collaboration/access/appLicense.jsp)).
 
 ADNI dataset includes data from 800 subjects, where 200 are normal controls, 400 are individuals with MCI and 200 present signs of Alzheimer. In this thesis, it has worked with MRIs from patients under normal controls (CN) and Alzheimer's disease (AD).
 
