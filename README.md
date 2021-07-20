@@ -1,12 +1,12 @@
 # Alzheimer’s disease detection using Convolutional Neural Networks
 Project done by Fernando Herrán Albelda (Master in Data Science for KSchool). 
 
-An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been build for this thesis and can be used by the user to predict if a patient has signs of Alzheimer uploading a MRI of his brain. Github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
+An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been build for this thesis and can be used by the user to predict if a patient has signs of Alzheimer or not. The only input needed to run the application is to upload a Magnetic Resonance Image (MRI) of his brain, which must be in NIfTI format (.nii or .nii.gz). The github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
 
 ## Introduction
 
 ### Objective
-The goal of this thesis is to build a 3D - Convolutional Neural Network to classify patients with Alzheimer's disease (AD) or cognitively normal (CN) using Magnetic Resonance Images (MRI) of their brains. The problem consists of a binary classification and is justified by the need to learn about the use of Deep Learning to solve problems where images are related, and to understand the impact of the different layers in the performance of the neural network.
+The goal of this thesis is to build a 3D - Convolutional Neural Network to classify patients with Alzheimer's disease (AD) or cognitively normal (CN) using MRIs of their brains. The problem consists of a binary classification and is justified by the need to learn about the use of Deep Learning to solve problems where images are related, and to understand the impact of the network structure on the performance.
 
 ### Requirements
 Next libraries are used in the code:
@@ -20,7 +20,7 @@ Next libraries are used in the code:
 ### Set-up virtual environment
 In order to run the code without having dependencies problems, user can create a virtual environment with all needed packages. To do that, please follow process below: 
 - Download `requirements.txt` file found in this master branch.
-- Open terminal, and run below command (tt will create a virtual environment in your computer):
+- Open terminal, and run below command (it will create a virtual environment in your computer):
 
 ```
 python -m venv virtual_env
@@ -37,26 +37,74 @@ pip install -r requirements.txt
 
 ## Repository
 
-This repository has 3 main folders (Dataset, Notebooks and Results), together with the requirement.txt file and the README.md .
+In order to run the code without having issues of directories or files missing, user should create a folder in his computer or Google Drive called 'TFM' (or other name), and place inside 3 folders: Datasets, Notebooks and Results.
+
+In this Github repository, user can get the folders Notebooks and Results, whilst the folder Datasets can be found in this Google Drive [folder](https://drive.google.com/drive/folders/1oNPSc0m6J8Acot32bvU4BDOPVDlgfeut?usp=sharing). 
+
+So, the directory structure should be as follows:
+
+```
+TFM
+├── Datasets
+├── Notebooks
+└── Results
+```
 
 ### Dataset
 
-Data needed to carry out this project has been obtained from the Alzheimer’s Disease Neuroimaging Initiative (ADNI) organization . This organization unites researchers which objective is to study and define the progression of Alzheimer’s disease (AD). ADNI organization collects different type data, including MRI and PET images, genetics, cognitive tests, blood biomarkers, etc. The access to this data is not opened to the public in general, and an application must be sent in order to get access to the data (here).
+All data needed to carry out this project has been obtained from the [Alzheimer’s Disease Neuroimaging Initiative (ADNI)](http://adni.loni.usc.edu/about/) organization. This organization unites researchers which objective is to study and define the progression of Alzheimer’s disease (AD). ADNI organization collects different type data, including MRI and PET images, genetics, cognitive tests, blood biomarkers, etc. The access to this data is not opened to the public in general, and an application must be sent in order to get access to the data (here).
 
-ADNI includes data from 800 subjects, where 200 are normal controls, 400 are individuals with MCI and 200 present signs of Alzheimer. From all the data accessible in ADNI, only MRIs have been used in this thesis. 
+ADNI dataset includes data from 800 subjects, where 200 are normal controls, 400 are individuals with MCI and 200 present signs of Alzheimer. In this thesis, it has worked with MRIs from patients under normal controls (CN) and Alzheimer's disease (AD).
+
+As explained in Notebook 1_Capture_data, once the raw data is downloaded from ADNI, it is presented in multiple folders and with a total size of 121 GB. The Notebook 1_Capture_data is used to reorganize all these folders, zip the MRIs files and stored them in a unique folder called Extracted_files, which has a total total size of 72GB.
+
+Below it can be seen the files presented in the folder Datasets:
+
+```
+TFM
+└── Datasets
+    ├── Extracted_files: folder which contains all the MRIs files. The folder size is 72 GB.
+    ├── Image_files: folder which contains the images needed to train the CNN in a numpy’s compressed format (.npz). The folder size is 1.32 GB.
+    ├── TFRecords: folder which contains the images needed to train the CNN in TFRecords format. The folder size is 5.24 GB.
+    ├── ADNI1_Complete_1Yr_1.5T.csv
+    ├── ADNI1_Complete_2Yr_1.5T.csv
+    ├── ADNI1_Complete_3Yr_1.5T.csv
+    └── list_titles.npz: list which contains the Image IDs of the files that must be used to train the CNN.
+```
+
+TFRecords can also be found in this Google Cloud Storage [bucket](https://console.cloud.google.com/storage/browser/tfm-kschool-bucket?project=tfm-kschool&pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))\&prefix=\&forceOnObjectsSortingFiltering=false), as to work with Notebook 4_CNN_creation via Google Colab, it is needed to load the TFRecords from a Google bucket.
 
 ### Notebooks
 
-This project contains 5 jupyter notebooks, which can be found in the folder Notebooks.
+This project contains 5 main jupyter Notebooks, which are used to carry out all the process (from capturing the raw data, preprocess it, convert them to TFRecords and create the CNN). Inside the folder Notebooks, there is a folder called aux_functions, which contains some python files with functions used in the Notebooks, and another folder called pictures, which contains some images used in the Notebooks.
+
 - 1_Capture_data
 - 2_MRI_preprocessing
 - 3_TFR_preprocessing
 - 4_CNN_creation
 - 5_Alzheimer_prediction
 
-In the folder Notebooks, a subfolder called aux_functions contains some python files, which contains functions used in the jupyter notebooks.
+Below it can be seen the Notebooks directory structure:
+
+```
+TFM
+└── Notebooks
+    ├── 1_Capture_data.ipynb
+    ├── 2_MRI_preprocessing.ipynb
+    ├── 3_TFR_preprocessing.ipynb
+    ├── 4_CNN_creation.ipynb
+    ├── 5_Alzheimer_prediction.ipynb
+    ├── aux_functions
+    |    ├── aux_functions_visualization.py
+    |    ├── aux_functions_cnn.py
+    |    ├── deepbrain_package
+    |    ├── app_functions
+    |    └── ad_detection.py
+    └── pictures
+```
 
 ## Results & Conclusions
+
 
 Below it is presented a summary of the results obtained. As it can be seen, the CNN model trained in this project has a recall of 92% and an accuracy of 84%.
 
@@ -65,3 +113,14 @@ Below it is presented a summary of the results obtained. As it can be seen, the 
 Looking at the roc curve, even the model fits very well with the training dataset, it also give good results with the testing dataset.
 
 ![alt text](https://github.com/fernandoherran/master-thesis/blob/4ca06d851737e0d65e047c6430bdca1b0b8725cc/Results/figures/roc_curve.png)
+
+These figures, together with the CNN model can be found in the folder Results. This folder contains the following files:
+
+```
+TFM
+└── Results
+    ├── cnn_model.h5
+    ├── cnn_model_history.npy
+    ├── figures
+    └── optuna_studies
+```
