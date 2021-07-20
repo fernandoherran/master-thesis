@@ -1,9 +1,10 @@
 # Import libraries
 ########################
+
+import os
 import pandas as pd
 import numpy as np
 from functools import reduce
-import os
 
 # Visualization packages
 import seaborn as sns
@@ -118,7 +119,7 @@ def plot_history(history, save_fig = False):
         x = range(1, len(train_plot) + 1)
 
         if key_ != 'loss':
-          axes[index_].set_ylim(top=1.05)
+            axes[index_].set_ylim(top=1.05)
 
 
         axes[index_].plot(x, train_plot, 'b', label='Train')
@@ -141,7 +142,7 @@ def plot_history(history, save_fig = False):
         plt.savefig(save_fig, dpi = 500, transparent = False)
         
 
-def get_evaluation(y, y_predict, save_fig):
+def get_evaluation(y, y_predict, save_fig = False):
     '''
     Function to plot the confusion matrix
     Inputs: true labels, predicted labels
@@ -251,37 +252,30 @@ def get_metrics(y_true, y_predict):
 
 def f1(y_true, y_pred):
     '''
-    Function used to calculate f1 score during the model training.
+    Function used to calculate the F1 score metric
     '''
-    
+
     def recall(y_true, y_pred):
         '''
-        Recall metric.
-
-        Only computes a batch-wise average of recall.
-
-        Computes the recall, a metric for multi-label classification of
-        how many relevant items are selected.
+        Function used to calculate the Recall metric
         '''
         true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
         possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
         recall = true_positives / (possible_positives + K.epsilon())
+        
         return recall
 
     def precision(y_true, y_pred):
         '''
-        Precision metric.
-
-        Only computes a batch-wise average of precision.
-
-        Computes the precision, a metric for multi-label classification of
-        how many selected items are relevant.
+        Function used to calculate the Precision metric
         '''
         true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
         predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
         precision = true_positives / (predicted_positives + K.epsilon())
-        return precision
         
+        return precision
+
     precision = precision(y_true, y_pred)
     recall = recall(y_true, y_pred)
+
     return 2*((precision*recall)/(precision+recall+K.epsilon()))

@@ -2,14 +2,12 @@
 import numpy as np
 import nibabel as nib
 from scipy import ndimage
-from aux_functions.deepbrain_package.extractor import Extractor
+from deepbrain_package.extractor import Extractor
 
-# Import tensorflow packahes
+# Import tensorflow packages
 import tensorflow as tf
 import tensorflow.keras.backend as k
 from tensorflow.keras.models import load_model 
-from tensorflow.keras.optimizers import SGD, Adam
-from tensorflow.keras.metrics import BinaryAccuracy
 
 # Activation maps packages
 import cv2
@@ -18,48 +16,86 @@ from skimage.transform import resize
 
 
 def read_nifti_file(file):
-    """
-    Read and load nifti file.
-    """
+    '''
+    Function used to load and read a NIfTI file
+    Inputs: NIfTI file directory
+    Output: NIfTI image data
+    ''' 
     
-    # Read file
+    # Load NIfTI file
     volume = nib.load(file)
-
-    # Get raw data
+    
+    # Read image data from NIfTI file
     volume = volume.get_fdata()
-    
-    # Exchange axis 0 and 2
-    if volume.shape[1] == volume.shape[2]:
-        print(f"{file} has a shape incompatible")
-    
+        
     return volume
 
 
 def remove_skull(volume):
-    """
-    Extract only brain mass from volume.
-    """
+    '''
+    Function used to remove skull from brain image
+    Inputs: MRI image
+    Output: brain image without skull
+    ''' 
     
-    # Initialize brain tissue extractor
+    # Initialize brain mass extractor
     ext = Extractor()
 
-    # Calculate probability of being brain tissue
+    # Calculate probability of being brain mass
     prob = ext.run(volume) 
 
-    # Extract mask with probability higher than 0.5
+    # Extract mask with probability higher than 50% of being brain mass
     mask = prob > 0.5
     
-    # Detect only pixels with brain mass
+    # Detect mask from image
     volume [mask == False] = 0
-    volume = volume.astype("float32")
+    volume = volume.astype('float32')
     
     return volume
 
 
+def resize_volume(volume):
+    '''
+    Function used to resize the brain image
+    Input: brain image
+    Output: brain image resized
+    '''
+    
+    # Exchange axis 0 and 2
+    if volume.shape[1] == volume.shape[2]:
+        volume = np.swapaxes(volume, 0, 2)
+
+    # Cut volume
+    if volume.shape[0] == 256:
+        volume = volume[20:210, 40:240, 20:140]
+
+    if volume.shape[0] == 192:
+        volume = volume[25:175, 30:180,15:155]
+    
+    # Define desired shape
+    input_shape = (110,130,80)
+    
+    # Compute factors
+    height = volume.shape[0] / input_shape[0]
+    width = volume.shape[1] / input_shape[1]
+    depth = volume.shape[2] / input_shape[2]
+
+    height_factor = 1 / height
+    width_factor = 1 / width
+    depth_factor = 1 / depth
+    
+    # Resize image
+    volume_new = ndimage.zoom(volume, (height_factor, width_factor, depth_factor), order=1)
+        
+    return volume_new
+    
+
 def normalize(volume):
-    """
-    Normalize the volume intensity.
-    """
+    '''
+    Function used to normalize the image pixel intensity
+    Input: brain image
+    Output: brain image normalized
+    '''
     
     I_min = np.amin(volume)
     I_max = np.amax(volume)
@@ -67,130 +103,81 @@ def normalize(volume):
     new_max = 1.0
     
     volume_nor = (volume - I_min) * (new_max - new_min)/(I_max - I_min)  + new_min
-    volume_nor = volume_nor.astype("float32")
+    volume_nor = volume_nor.astype('float32')
     
     return volume_nor
 
 
-def cut_volume(volume):
-    """
-    Cut size of 3D volume.
-    """
-    
-    if volume.shape[0] == 256:
-        volume_new = volume[20:220,30:,:]
-    
-    if volume.shape[0] == 192:
-        volume_new = volume[20:180,20:180,:]
-    
-    return volume_new
-
-
-def resize_volume(volume):
-    """
-    Resize across z-axis
-    """
-    
-    # Set the desired depth
-    desired_height = 180
-    desired_width = 180
-    desired_depth = 110
-    
-    # Get current depth
-    current_height = volume.shape[0]
-    current_width = volume.shape[1]
-    current_depth = volume.shape[2]
-    
-    # Compute depth factor
-    height = current_height / desired_height
-    width = current_width / desired_width
-    depth = current_depth / desired_depth
-
-    height_factor = 1 / height
-    width_factor = 1 / width
-    depth_factor = 1 / depth
-    
-    # Rotate
-    #img = ndimage.rotate(img, 90, reshape=False)
-    
-    # Resize across z-axis
-    volume = ndimage.zoom(volume, (height_factor, width_factor, depth_factor), order=1)
-    
-    return volume
-    
-
 def process_scan(file):
-    """
-    Read, skull stripping and resize Nifti file.
-    """
+    '''
+    Function used to process a NIfTI file (read, remove skull, resize, normalize and save it as numpy file)
+    Input: NIfTI file directory
+    Output: directory where to save the NIfTI file processed as numpy’s compressed format (.npz)
+    '''
     
     # Read Nifti file
     volume = read_nifti_file(file)
     
-    # Extract skull from 3D volume
+    # Remove skull from image
     volume = remove_skull(volume)
     
-    # Cut 3D volume
-    volume = cut_volume(volume)
-    
-    # Resize width, height and depth
+    # Resize 3D image
     volume = resize_volume(volume)
     
     # Normalize pixel intensity
     volume = normalize(volume)
-    
+
     return volume
 
 
-def f1(y_true, y_pred):
-    def recall(y_true, y_pred):
-        """Recall metric.
-
-        Only computes a batch-wise average of recall.
-
-        Computes the recall, a metric for multi-label classification of
-        how many relevant items are selected.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
-        recall = true_positives / (possible_positives + K.epsilon())
-        return recall
-
-    def precision(y_true, y_pred):
-        """Precision metric.
-
-        Only computes a batch-wise average of precision.
-
-        Computes the precision, a metric for multi-label classification of
-        how many selected items are relevant.
-        """
-        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
-        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
-        precision = true_positives / (predicted_positives + K.epsilon())
-        return precision
-    precision = precision(y_true, y_pred)
-    recall = recall(y_true, y_pred)
-    return 2*((precision*recall)/(precision+recall+K.epsilon()))
-
-
 def load_cnn(model_name, path):
+    '''
+    Function used to load a CNN model saved in h5 format
+    Input: model directory, path where there is the folder Results with the model
+    Output: model loaded
+    '''
+
+    def f1(y_true, y_pred):
+        '''
+        Function used to calculate the F1 score metric
+        '''
+
+        def recall(y_true, y_pred):
+            '''
+            Function used to calculate the Recall metric
+            '''
+            true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+            possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+            recall = true_positives / (possible_positives + K.epsilon())
+            return recall
+
+        def precision(y_true, y_pred):
+            '''
+            Function used to calculate the Precision metric
+            '''
+            true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+            predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+            precision = true_positives / (predicted_positives + K.epsilon())
+            return precision
+
+        precision = precision(y_true, y_pred)
+        recall = recall(y_true, y_pred)
+        
+        return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
     # Load model
     model = load_model(path + "Results/" + model_name + ".h5", 
                        custom_objects = {'f1': f1})
 
-    # Define optimizer
-    optimizer = Adam(learning_rate = 0.001, decay = 1e-6)
-
-    # Compile model
-    model.compile(loss = "binary_crossentropy",
-                  optimizer = optimizer,
-                  metrics = [BinaryAccuracy(), f1])
-
     return model
 
 
-def get_activation_map(model, volume, layer_name = 'conv3d_31'):
+def get_activation_map(model, volume, layer_name = 'conv3d_23'):
+    '''
+    Function used to extract the activation maps of a CNN
+    Inputs: CNN model, 3D image, last convolutional layer of the model
+    Output: 3D image with the activation map
+    ''' 
 
     # Layer to visualize
     layer_name = layer_name
@@ -231,28 +218,82 @@ def get_activation_map(model, volume, layer_name = 'conv3d_31'):
     return overlay_volume
 
 
-def plotly_2d(volume): 
+def act_map_2d(volume, view = "first"):  
+    '''
+    Function used to plot a 2D activation map
+    Inputs: 3D image, view (first, second or third)
+    Output: figure with the activation map
+    ''' 
     
+    def get_surface_frame(view, volume, k):
+    
+        if view == 'first':
+
+            return volume[109 - k,:,:]
+
+        elif view == 'second':
+
+            return volume[:,129 - k,:]
+
+        elif view == 'third':
+
+            return volume[:,:,79-k]
+    
+    def get_surface_trace(view, volume, k):
+
+        if view == 'first':
+
+            return volume[109,:,:]
+
+        elif view == 'second':
+
+            return volume[:,129,:]
+
+        elif view == 'third':
+
+            return volume[:,:,79]
+    
+    if view == "first":
+        
+        # Define axis
+        r = volume.shape[1]
+        c = volume.shape[2]
+        
+        # Define frames
+        nb_frames = volume.shape[0]
+    
+    elif view == 'second':
+        
+        # Define axis
+        r = volume.shape[0]
+        c = volume.shape[2]
+        
+        # Define frames
+        nb_frames = volume.shape[1]
+        
+    elif view == 'third':
+          
+        # Define axis
+        r = volume.shape[0]
+        c = volume.shape[1]
+        
+        # Define frames
+        nb_frames = volume.shape[2] 
+  
+    # Get minimum and maximum pixel values of the volume
     min_value = np.amin(volume)
     max_value = np.amax(volume)
     
-    # Define axis
-    r = volume.shape[0]
-    c = volume.shape[2]
-
-    # Define frames
-    nb_frames = volume.shape[1]
-    
     # Define Plotly figure
     fig = go.Figure(frames = [go.Frame(data = go.Surface(z = (6.7 - k * 0.1) * np.ones((r, c)),
-                                                         surfacecolor = np.flipud(volume[:,129 - k,:]),
+                                                         surfacecolor = np.flipud(get_surface_frame(view, volume, k)),
                                                          cmin = min_value, 
                                                          cmax = max_value),
                                        name=str(k)) for k in range(nb_frames)])
 
     # Add data to be displayed before animation starts
     fig.add_trace(go.Surface(z = 6.7 * np.ones((r, c)),
-                             surfacecolor = np.flipud(volume[:,129,:]),
+                             surfacecolor = np.flipud(get_surface_trace(view, volume, k)),
                              colorscale = 'jet',
                              cmin = min_value, 
                              cmax = max_value,
@@ -299,41 +340,33 @@ def plotly_2d(volume):
     fig.show()
 
 
-def plotly_3d(volume):
+def act_map_3d(volume):
+    '''
+    Function used to plot a 3D activation map
+    Inputs: 3D image
+    Output: figure with the activation map
+    ''' 
     
-    def resize_volume(volume):
-        """
-        Resize across z-axis
-        """
+    ## Resize image (as to plot the original 3D image will take a high computational time)
+    
+    # Define desired shape
+    input_shape = (55, 65, 40)
 
-        # Set the desired depth
-        desired_height = 55
-        desired_width = 65
-        desired_depth = 40
+    # Compute factors
+    height = volume.shape[0] / input_shape[0]
+    width = volume.shape[1] / input_shape[1]
+    depth = volume.shape[2] / input_shape[2]
 
-        # Get current depth
-        current_height = volume.shape[0]
-        current_width = volume.shape[1]
-        current_depth = volume.shape[2]
+    height_factor = 1 / height
+    width_factor = 1 / width
+    depth_factor = 1 / depth
 
-        # Compute depth factor
-        height = current_height / desired_height
-        width = current_width / desired_width
-        depth = current_depth / desired_depth
-
-        height_factor = 1 / height
-        width_factor = 1 / width
-        depth_factor = 1 / depth
-
-        # Rotate
-        #img = ndimage.rotate(img, 90, reshape=False)
-
-        # Resize across z-axis
-        volume = ndimage.zoom(volume, (height_factor, width_factor, depth_factor), order=1)
-
-        return volume
-
-    resized_volume = resize_volume(volume)
+    # Resize across z-axis
+    resized_volume = ndimage.zoom(volume, (height_factor, width_factor, depth_factor), order=1)
+        
+    # Get minimum and maximum pixel values of the volume
+    min_value = np.amin(resized_volume)
+    max_value = np.amax(resized_volume)
     
     X, Y, Z = np.mgrid[0:55:55j, 0:65:65j, 0:40:40j]
 
@@ -341,9 +374,10 @@ def plotly_3d(volume):
                                      y = Y.flatten(),
                                      z = Z.flatten(),
                                      value = resized_volume.flatten(),
-                                     isomin = 0.2,
-                                     isomax = 0.54,
+                                     isomin = min_value,
+                                     isomax = max_value,
                                      colorscale = "jet",
                                      opacity = 0.1,
                                      surface_count = 17))
     fig.show()
+
