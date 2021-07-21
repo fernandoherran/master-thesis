@@ -159,7 +159,7 @@ def get_evaluation(y, y_predict, save_fig = False):
                 accuracy,precision,recall,f1)
 
     # Calculate confusion matrix
-    cm_labels = ["Healty", "Alzheimer"]
+    cm_labels = ["CN", "AD"]
     cm = confusion_matrix(y, y_predict)
     cm = pd.DataFrame(cm, index = cm_labels, columns = cm_labels)
     

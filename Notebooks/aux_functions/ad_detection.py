@@ -1,10 +1,14 @@
 # Import libraries
+########################
+
 import sys
 import os
 import time
 from app_functions import *
 
-# Define process
+# Define main process
+########################
+
 if __name__ == '__main__':
 
     start = time.time()
