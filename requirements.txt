@@ -7,6 +7,7 @@ plotly
 nbformat
 opencv-python
 scikit-image
+seaborn
 
 # Data handling
 scipy
