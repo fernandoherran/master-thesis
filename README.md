@@ -1,7 +1,7 @@
 # Alzheimer’s disease detection using a Convolutional Neural Network
 Project done by Fernando Herrán Albelda (Master in Data Science for KSchool). 
 
-An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been build for this thesis and can be used by the user to predict if a patient has signs of Alzheimer or not. The only input needed to run the application is to upload a Magnetic Resonance Image (MRI) of his brain, which must be in NIfTI format (.nii or .nii.gz). The github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
+An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been built for this thesis and can be used by the user to predict if a patient has signs of Alzheimer or not. The only input needed to run the application is to upload a Magnetic Resonance Image (MRI) of his brain, which must be in NIfTI format (.nii or .nii.gz). The github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
 
 ## Introduction
 
@@ -46,7 +46,7 @@ In this Github repository, user can get the folders Notebooks and Results, whils
 So, the directory structure should be as follows:
 
 ```
-TFM
+master-thesis
 ├── Datasets
 ├── Notebooks
 └── Results
@@ -63,7 +63,7 @@ As explained in Notebook 1_Capture_data, once the raw data is downloaded from AD
 Below it can be seen the files presented in the folder Datasets:
 
 ```
-TFM
+master-thesis
 └── Datasets
     ├── Extracted_files: folder which contains all the MRIs files. The folder size is 72 GB.
     ├── Image_files: folder which contains the images needed to train the CNN in a numpy’s compressed format (.npz). The folder size is 1.32 GB.
@@ -89,7 +89,7 @@ This project contains 5 main jupyter Notebooks, which are used to carry out all 
 Below it can be seen the Notebooks directory structure:
 
 ```
-TFM
+master-thesis
 └── Notebooks
     ├── 1_Capture_data.ipynb
     ├── 2_MRI_preprocessing.ipynb
@@ -97,12 +97,11 @@ TFM
     ├── 4_CNN_creation.ipynb
     ├── 5_Alzheimer_prediction.ipynb
     ├── aux_functions
-    |    ├── aux_functions_visualization.py
-    |    ├── aux_functions_cnn.py
-    |    ├── deepbrain_package
-    |    ├── app_functions
-    |    └── ad_detection.py
-    └── pictures
+         ├── aux_functions_visualization.py
+         ├── aux_functions_cnn.py
+         ├── deepbrain_package
+         ├── app_functions
+         └── ad_detection.py
 ```
 
 ## Results & Conclusions
@@ -119,7 +118,7 @@ Looking at the roc curve, even the model fits very well with the training datase
 These figures, together with the CNN model can be found in the folder Results. This folder contains the following files:
 
 ```
-TFM
+master-thesis
 └── Results
     ├── cnn_model.h5
     ├── cnn_model_history.npy
