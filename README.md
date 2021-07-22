@@ -28,11 +28,11 @@ git clone https://github.com/fernandoherran/master-thesis.git
 ```
 python -m venv virtual_env
 ```
-- Once created, user can activate the virtual environment running the following command:
+- Once created, user can activate the virtual environment running the following command (first user must deactivate the current environment):
 ```
  source virtual_env/bin/activate
 ```
-- Finally, user can install all needed dependencies in the virtual environment running the following command (file requirements.txt has been downloaded when cloning the repository:
+- Finally, user can install all needed dependencies in the virtual environment running the following command (file requirements.txt has been downloaded when cloning the repository):
 ```
 pip install -r requirements.txt
 ```
