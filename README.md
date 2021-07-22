@@ -1,7 +1,7 @@
 # Alzheimer’s disease detection using a Convolutional Neural Network
-Project done by Fernando Herrán Albelda (Master in Data Science for KSchool). 
+Project by Fernando Herrán Albelda (Master in Data Science for KSchool). 
 
-An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been built for this thesis and can be used by the user to predict if a patient has signs of Alzheimer or not. The only input needed to run the application is to upload a Magnetic Resonance Image (MRI) of his brain, which must be in NIfTI format (.nii or .nii.gz). The github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
+An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been built for this thesis and can be used by the user to predict if a patient has signs of Alzheimer or not. The only input needed to run the application is to upload a Magnetic Resonance Image (MRI) of his brain, which must be in NIfTI format (.nii or .nii.gz). The Github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
 
 ## Introduction
 
@@ -18,30 +18,30 @@ Next libraries are used in the code:
 - Others: os, sys, time, numpy, pandas, random, scipy, shutil, sklearn,tqdm, functools, skimage, gzip
 
 ### Set-up virtual environment
-In order to run the code without having dependencies problems, user can create a virtual environment with all needed packages. This virtual environment has a total size of 1.31 GB. To create the virtual environment, please follow process below: 
+In order to run the code without having dependencies problems, the user can create a virtual environment with all the needed packages. This virtual environment has a total size of 1.31 GB. To create the virtual environment, please follow process below: 
 
-- Clone github repository in your computer. Open terminal, and run comand below:
+- Clone Github repository in your computer. Open terminal, and run comand below:
 ```
 git clone https://github.com/fernandoherran/master-thesis.git
 ```
-- Once cloaned, run below command to create a virtual environment in your computer:
+- Once cloned, run below command to create the virtual environment in your computer:
 ```
 python -m venv virtual_env
 ```
-- Once created, user can activate the virtual environment running the following command (first user must deactivate the current environment):
+- Once created, the user can activate the virtual environment running the following command (first, the user must deactivate the current environment):
 ```
  source virtual_env/bin/activate
 ```
-- Finally, user can install all needed dependencies in the virtual environment running the following command (file requirements.txt has been downloaded when cloning the repository):
+- Finally, the user can install all the needed dependencies in the virtual environment running the following command (file requirements.txt has been downloaded when cloning the repository):
 ```
 pip install -r requirements.txt
 ```
 
 ## Repository
 
-In order to run the code without having issues of directories or files missing, user should create a folder in his computer or Google Drive called 'TFM' (or other name), and place inside 3 folders: Datasets, Notebooks and Results.
+In order to run the code without having issues of directories or files missing, the user should create a folder in his computer or Google Drive called 'master-thesis' (or other name), and place inside the following three folders: Datasets, Notebooks and Results.
 
-In this Github repository, user can get the folders Notebooks and Results, whilst the folder Datasets can be found in this Google Drive [folder](https://drive.google.com/drive/folders/1oNPSc0m6J8Acot32bvU4BDOPVDlgfeut?usp=sharing). 
+In this Github repository, the user can get the folders Notebooks and Results, whilst the folder Datasets can be found in this Google Drive [folder](https://drive.google.com/drive/folders/1oNPSc0m6J8Acot32bvU4BDOPVDlgfeut?usp=sharing). 
 
 So, the directory structure should be as follows:
 
@@ -54,11 +54,11 @@ master-thesis
 
 ### Dataset
 
-All data needed to carry out this project has been obtained from the [Alzheimer’s Disease Neuroimaging Initiative (ADNI)](http://adni.loni.usc.edu/about/) organization. This organization unites researchers which objective is to study and define the progression of Alzheimer’s disease (AD). ADNI organization collects different type data, including MRI and PET images, genetics, cognitive tests, blood biomarkers, etc. The access to this data is not opened to the public in general, and an application must be sent in order to get access to the data (more information [here](https://ida.loni.usc.edu/collaboration/access/appLicense.jsp)).
+All data needed to carry out this project has been obtained from the [Alzheimer’s Disease Neuroimaging Initiative (ADNI)](http://adni.loni.usc.edu/about/) organization. This organization unites researchers which objective is to study and define the progression of Alzheimer’s disease (AD). ADNI organization collects different types of data, including MRI and PET images, genetics, cognitive tests, blood biomarkers, etc. Access to this data is not opened to the public in general, and an application must be sent in order to get access to the data (more information [here](https://ida.loni.usc.edu/collaboration/access/appLicense.jsp)).
 
 ADNI dataset includes data from 800 subjects, where 200 are normal controls, 400 are individuals with MCI and 200 present signs of Alzheimer. In this thesis, it has worked with MRIs from patients under normal controls (CN) and Alzheimer's disease (AD).
 
-As explained in Notebook 1_Capture_data, once the raw data is downloaded from ADNI, it is presented in multiple folders and with a total size of 121 GB. The Notebook 1_Capture_data is used to reorganize all these folders, zip the MRIs files and stored them in a unique folder called Extracted_files, which has a total total size of 72GB.
+As explained in ***Notebook 1_Capture_data***, once the raw data is downloaded from ADNI, it is presented in multiple folders and with a total size of 121 GB. The Notebook 1_Capture_data is used to reorganize all these folders, zip the MRIs files and stored them in a unique folder called *Extracted_files*, which has a total size of 72GB.
 
 Below it can be seen the files presented in the folder Datasets:
 
@@ -74,11 +74,11 @@ master-thesis
     └── list_titles.npz: list which contains the Image IDs of the files that must be used to train the CNN.
 ```
 
-TFRecords can also be found in this Google Cloud Storage [bucket](https://console.cloud.google.com/storage/browser/tfm-kschool-bucket?project=tfm-kschool&pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))\&prefix=\&forceOnObjectsSortingFiltering=false), as to work with Notebook 4_CNN_creation via Google Colab, it is needed to load the TFRecords from a Google bucket.
+TFRecords can also be found in this Google Cloud Storage [bucket](https://console.cloud.google.com/storage/browser/tfm-kschool-bucket?project=tfm-kschool&pageState=(%22StorageObjectListTable%22:(%22f%22:%22%255B%255D%22))\&prefix=\&forceOnObjectsSortingFiltering=false), as to work with the Notebook ***4_CNN_creation*** via Google Colab, it is needed to load the TFRecords from a Google bucket.
 
 ### Notebooks
 
-This project contains 5 main jupyter Notebooks, which are used to carry out all the process (from capturing the raw data, preprocess it, convert them to TFRecords and create the CNN). Inside the folder Notebooks, there is a folder called aux_functions, which contains some python files with functions used in the Notebooks, and another folder called pictures, which contains some images used in the Notebooks.
+This project contains five main jupyter Notebooks, which are used to carry out all the process (from capturing the raw data, preprocess it, convert them to TFRecords and create the CNN). Inside the folder Notebooks, there is a folder called *aux_functions*, which contains some python files with functions used in the Notebooks.
 
 - 1_Capture_data
 - 2_MRI_preprocessing
@@ -96,7 +96,7 @@ master-thesis
     ├── 3_TFR_creation.ipynb
     ├── 4_CNN_creation.ipynb
     ├── 5_Alzheimer_prediction.ipynb
-    ├── aux_functions
+    └── aux_functions
          ├── aux_functions_visualization.py
          ├── aux_functions_cnn.py
          ├── deepbrain_package
@@ -115,7 +115,7 @@ Looking at the roc curve, even the model fits very well with the training datase
 
 ![alt text](https://github.com/fernandoherran/master-thesis/blob/4ca06d851737e0d65e047c6430bdca1b0b8725cc/Results/figures/roc_curve.png)
 
-These figures, together with the CNN model can be found in the folder Results. This folder contains the following files:
+These figures, together with the CNN model in .h5 format can be found in the folder Results. This folder contains the following files:
 
 ```
 master-thesis
