@@ -1,7 +1,7 @@
 # Alzheimer’s disease detection using a Convolutional Neural Network
 Project by Fernando Herrán Albelda (Master in Data Science for KSchool). 
 
-An [interactive application](https://alzheimer-detection.herokuapp.com/) using Streamlit has been built for this thesis and can be used by the user to predict if a patient has signs of Alzheimer or not. The only input needed to run the application is to upload a Magnetic Resonance Image (MRI) of his brain, which must be in NIfTI format (.nii or .nii.gz). The Github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
+An [interactive application](https://alzheimer-prediction.azurewebsites.net) using Streamlit has been built for this thesis and can be used by the user to predict if a patient has signs of Alzheimer or not. The only input needed to run the application is to upload a Magnetic Resonance Image (MRI) of his brain, which must be in NIfTI format (.nii or .nii.gz). The Github repository of this application can be found [here](https://github.com/fernandoherran/thesis-streamlit-app).
 
 ## Introduction
 
